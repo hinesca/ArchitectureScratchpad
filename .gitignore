@@ -1,0 +1,7 @@
+*.dll
+*.pdb
+*.cache
+*.suo
+bin
+obj
+ArchitechureScratchpad\bin
