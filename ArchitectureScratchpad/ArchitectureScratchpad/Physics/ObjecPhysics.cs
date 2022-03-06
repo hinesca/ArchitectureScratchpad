@@ -18,7 +18,7 @@ namespace ArchitectureScratchpad.Physics
             {
                 for (int i=0; i < physicalObject.Trajectory.InitialVelocity.Length; i++)
                 {
-                    physicalObject.Trajectory.InitialVelocity[i] += ImpulseForces[f,i] / physicalObject.Mass * dt.Seconds;
+                    physicalObject.Trajectory.InitialVelocity[i] += ImpulseForces[f,i] / physicalObject.Mass * dt.TotalSeconds;
                 }
             }
               // Update the intial position

@@ -7,7 +7,7 @@ namespace ArchitectureScratchpad.Physics
 {
      public class Trajectory
      {
-          public DateTime TZero {get; set;}
+        public DateTime TZero { get; set; } = DateTime.Now;
           public double[] InitialPosition { get; set; }
           public double[] InitialVelocity { get; set; }
      }

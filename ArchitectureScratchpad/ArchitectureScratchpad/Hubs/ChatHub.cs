@@ -7,7 +7,6 @@ namespace ArchitectureScratchpad.Hubs
      {
           public async Task SendMessage(string user, string message)
           {
-               List<Task> listOfTasks = new List<Task>();
                if (message == "throw snowball") {
                     update_snowball = true;
                     snowBall.Trajectory = new Physics.Trajectory();
