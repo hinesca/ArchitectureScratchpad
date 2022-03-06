@@ -11,9 +11,9 @@ namespace ArchitectureScratchpad.Physics
           {
                get
                {
-                    double[] returnPosition = Trajectory.IntitalPosition;
+                    double[] returnPosition = Trajectory.InitialPosition;
                     TimeSpan dt = DateTime.Now - Trajectory.TZero;
-                    for (int i=0; i < Trajectory.IntitalPosition.Length; i++)
+                    for (int i=0; i < Trajectory.InitialPosition.Length; i++)
                     {
                          returnPosition[i] += Trajectory.InitialVelocity[i] * dt.TotalSeconds;
                     }
@@ -22,6 +22,8 @@ namespace ArchitectureScratchpad.Physics
           }
           public Trajectory Trajectory { get; set; }
           public object Sprite { get; set; }
+          public double Mass { get; set; }
           public IPhysicalObject Parent { get; set; }
+
      }
 }

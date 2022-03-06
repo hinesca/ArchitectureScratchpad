@@ -2,5 +2,7 @@
 *.pdb
 *.cache
 *.suo
-ArchitechureScratchpad\obj
+.vs
+bin
+obj
 ArchitechureScratchpad\bin

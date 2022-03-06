@@ -7,9 +7,8 @@ namespace ArchitectureScratchpad.Physics
 {
      public class SnowBall : PhysicalObjectBase
      {
-          public SnowBall()
-          {
-               Sprite = 'o';
-          }
+          
+          new public object Sprite { get; set; } = 'o';
+          new public double Mass { get; set; } = 0.5;
      }
 }
