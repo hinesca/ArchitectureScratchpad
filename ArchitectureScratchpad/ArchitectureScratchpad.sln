@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebServer", "ArchitectureScratchpad\WebServer.csproj", "{91AB939E-AEBE-4BB7-9530-092661E5F40B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Physics", "Physics\Physics.csproj", "{13B2CC0F-B2FC-4C2B-B1CD-8F78F8F12456}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Physics", "Physics\Physics.csproj", "{13B2CC0F-B2FC-4C2B-B1CD-8F78F8F12456}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desktop", "Desktop\Desktop.csproj", "{5C08868A-0F13-4B09-80A3-2014E7CCBECB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{13B2CC0F-B2FC-4C2B-B1CD-8F78F8F12456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13B2CC0F-B2FC-4C2B-B1CD-8F78F8F12456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13B2CC0F-B2FC-4C2B-B1CD-8F78F8F12456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C08868A-0F13-4B09-80A3-2014E7CCBECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C08868A-0F13-4B09-80A3-2014E7CCBECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C08868A-0F13-4B09-80A3-2014E7CCBECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C08868A-0F13-4B09-80A3-2014E7CCBECB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

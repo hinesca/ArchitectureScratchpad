@@ -1,4 +1,4 @@
-﻿namespace ArchitectureScratchpad.Physics
+﻿namespace Physics
 {
      public class SnowBall : PhysicalObjectBase
      {

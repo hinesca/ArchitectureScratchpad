@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ArchitectureScratchpad.Physics
+namespace Physics
 {
      public class PhysicalObjectBase : IPhysicalObject
      {
@@ -8,9 +8,9 @@ namespace ArchitectureScratchpad.Physics
           {
                get
                {
-                    double[] returnPosition = Trajectory.IntitalPosition;
-                    TimeSpan dt = DateTime.Now - Trajectory.TZero;
-                    for (int i=0; i < Trajectory.IntitalPosition.Length; i++)
+                    double[] returnPosition = Trajectory.InitialPosition;
+                    TimeSpan dt = DateTime.Now - Trajectory.InitialTime;
+                    for (int i=0; i < Trajectory.InitialPosition.Length; i++)
                     {
                          returnPosition[i] += Trajectory.InitialVelocity[i] * dt.TotalSeconds;
                     }
