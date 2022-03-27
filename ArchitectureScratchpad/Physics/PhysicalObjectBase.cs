@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ArchitectureScratchpad.Physics
 {
@@ -18,7 +15,7 @@ namespace ArchitectureScratchpad.Physics
                          returnPosition[i] += Trajectory.InitialVelocity[i] * dt.TotalSeconds;
                     }
                     return returnPosition;
-               }          
+               }
           }
           public Trajectory Trajectory { get; set; }
           public object Sprite { get; set; }
