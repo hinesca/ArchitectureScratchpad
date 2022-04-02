@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Physics
 {
@@ -30,8 +31,61 @@ namespace Physics
           
           public TrajectoryType TrajectoryType { get; set; }
           public STPosition[] Path { get; set; }
+
+          private STPosition _nextPointOnPath;
+          public STPosition NextPointOnPath
+          {
+               get
+               {
+                    DateTime now = DateTime.UtcNow;
+                    if (_nextPointOnPath == null && _nextPointOnPath.Time < now)
+                    {
+                         _nextPointOnPath = Path.FirstOrDefault(p => p.Time > now);
+                         if (_nextPointOnPath == null)
+                              _nextPointOnPath = Path.Last();
+                    }
+                    return _nextPointOnPath;
+               }
+          }
+
+          private STPosition _lastPointOnPath;
+          public STPosition PreviousPointOnPath
+          {
+               get
+               {
+                    DateTime now = DateTime.UtcNow;
+                    if (_lastPointOnPath == null || _lastPointOnPath.Time < now)
+                    {
+                         _lastPointOnPath = Path.LastOrDefault(p => p.Time > now);
+                         if (_lastPointOnPath == null)
+                              _lastPointOnPath = Path.Last();
+                    }
+                    return _lastPointOnPath;
+               }
+          }
+
+          public Vector Velocity
+          {
+               get
+               {
+                    // TODO: Review
+                    DateTime now = DateTime.UtcNow;
+
+                    if (now > Path.Last().Time)
+                         return new Vector(); // Zero vector
+
+                         TimeSpan interval = NextPointOnPath.Time - PreviousPointOnPath.Time;
+                    return NextPointOnPath.Position - PreviousPointOnPath.Position * (1 / interval.TotalSeconds);
+               }
+          }
+
           public Trajectory ParentTrajectory { get; set; }
           public STPosition ParentOffset { get; set; }
+
+          public STPosition GetPosition()
+          {
+               return GetPosition(this);
+          }
 
           public static STPosition GetPosition(Trajectory trajectory)
           {
@@ -40,44 +94,38 @@ namespace Physics
                     case TrajectoryType.Grounded:
                          return trajectory.Path[0];
                     case TrajectoryType.Linear:
-                         return GetLinearPosition();
+                         return GetPositionOnPath(trajectory);
                     case TrajectoryType.Path:
-                         return GetPositionOnPath();
+                         return GetPositionOnPath(trajectory);
                     case TrajectoryType.Offset:
-                         return GetOffsetPosition();
+                         return GetOffsetPosition(trajectory);
                     case TrajectoryType.Orbit:
-                         return GetOrbitalPosition();
+                         return GetOrbitalPosition(trajectory);
                     default:
                          return null;
                }
           }
 
-          // ******************  TODO Implement with parameters that makes sense **************************************
-          // ******************  Create and update trajectories and physical objects as needed ************************
-          private static STPosition GetLinearPosition()
+          private static STPosition GetPositionOnPath(Trajectory trajectory)
+          {
+               DateTime now = DateTime.UtcNow;
+
+               if (now > trajectory.Path.Last().Time)
+                    return new STPosition(trajectory.Path.Last().Position, now);
+
+               TimeSpan interval = now - trajectory.PreviousPointOnPath.Time;
+               return new STPosition(trajectory.PreviousPointOnPath.Position + trajectory.Velocity * interval.TotalSeconds, now);
+          }
+
+          private static STPosition GetOffsetPosition(Trajectory trajectory)
           {
                throw new NotImplementedException();
           }
 
-          private static STPosition GetOffsetPosition()
+          private static STPosition GetOrbitalPosition(Trajectory trajectory)
           {
                throw new NotImplementedException();
           }
-
-          private static STPosition GetOrbitalPosition()
-          {
-               throw new NotImplementedException();
-          }
-
-          private static STPosition GetPositionOnPath()
-          {
-               throw new NotImplementedException();
-          }
-          // ****************************  TODO Implement with parameters that makes sense ****************************
-
-
-
-
      }
 
      public enum TrajectoryType { Grounded, Linear, Path, Offset, Orbit }

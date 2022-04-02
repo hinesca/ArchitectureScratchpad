@@ -4,17 +4,11 @@ namespace Physics
 {
      public class PhysicalObjectBase : IPhysicalObject
      {
-          public double[] Position
+          public STPosition Position
           {
                get
                {
-                    double[] returnPosition = Trajectory.InitialPosition;
-                    TimeSpan dt = DateTime.Now - Trajectory.InitialTime;
-                    for (int i=0; i < Trajectory.InitialPosition.Length; i++)
-                    {
-                         returnPosition[i] += Trajectory.InitialVelocity[i] * dt.TotalSeconds;
-                    }
-                    return returnPosition;
+                    return Trajectory.GetPosition();
                }
           }
           public Trajectory Trajectory { get; set; }
