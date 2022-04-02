@@ -1,8 +1,5 @@
-*.dll
-*.pdb
-*.cache
-*.suo
-/ArchitectureScratchpad/.vs
-/ArchitectureScratchpad/ArchitectureScratchpad/obj
-/ArchitectureScratchpad/ArchitechureScratchpad/bin
-/ArchitectureScratchpad/ArchitectureScratchpad/bin/Debug/netcoreapp3.1
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ArchitectureScratchpad/.vs/ArchitectureScratchpad
