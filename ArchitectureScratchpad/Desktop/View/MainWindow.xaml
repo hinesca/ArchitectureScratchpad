@@ -7,11 +7,14 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-          <ItemsControl ItemsSource="{Binding PhysicalObjects}">
+          <ItemsControl>
                <Canvas
                     x:Name="Canvas"
                     MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                    MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
+                    MouseRightButtonDown="Canvas_MouseRightButtonDown"
+                    Height="1000"
+                    Width="1000"
+                    Background="AliceBlue"/>
           </ItemsControl>
      </Grid>
 </Window>

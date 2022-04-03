@@ -25,7 +25,12 @@ namespace Desktop
 
           private void UpdatePlayerTrajectory(object o)
           {
-               Player.Trajectory = new Trajectory(o as STPosition[]);
+               STPosition target = o as STPosition;
+               double range = (target.Position - Player.STPosition.Position).Magnitude;
+               double speed = Player.MaxPlayerSpeed;
+               target.Time = DateTime.UtcNow.AddSeconds(speed / range);
+               STPosition[] path = new STPosition[] { Player.STPosition, target };
+               Player.Trajectory = new Trajectory(path);
           }
 
           public RelayCommand ThrowSnowballCommand;
@@ -45,7 +50,7 @@ namespace Desktop
 
           #endregion **************************************************************************************************
           #region ***************************************** Properties ************************************************
-          private Player _player;
+          private Player _player = new Player();
           public Player Player
           {
                get { return _player; }
