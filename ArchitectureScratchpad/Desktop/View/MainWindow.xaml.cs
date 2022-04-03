@@ -30,7 +30,10 @@ namespace Desktop
 
           private void Canvas_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
           {
-
+               Point mousePoint = e.GetPosition(Canvas);
+               STPosition target = new STPosition(
+                    new Physics.Vector(mousePoint.X, mousePoint.Y, 0), DateTime.UtcNow);
+               VM.UpdatePlayerTrajectoryCommand.Execute(target);
           }
      }
 }
