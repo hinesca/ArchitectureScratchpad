@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Physics
+﻿namespace Physics
 {
      public class Player : PhysicalObjectBase
      {
-          public double MaxPlayerSpeed { get; set; } = 1;
-          public double MaxSnowballSpeed { get; set; } = 10;
+          public Player()
+          {
+               Trajectory = new Trajectory(new STPosition(new Vector(500, 500, 0)));
+               Sprite = '\u2603';
+          }
+          
+          public double MaxPlayerSpeed { get; set; } = 10;
+          public double MaxSnowballSpeed { get; set; } = 100;
      }
 }

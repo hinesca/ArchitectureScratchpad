@@ -38,7 +38,7 @@ namespace Physics
                get
                {
                     DateTime now = DateTime.UtcNow;
-                    if (_nextPointOnPath == null && _nextPointOnPath.Time < now)
+                    if (_nextPointOnPath == null || _nextPointOnPath.Time < now)
                     {
                          _nextPointOnPath = Path.FirstOrDefault(p => p.Time > now);
                          if (_nextPointOnPath == null)

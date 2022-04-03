@@ -7,14 +7,39 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-          <ItemsControl>
-               <Canvas
-                    x:Name="Canvas"
-                    MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                    MouseRightButtonDown="Canvas_MouseRightButtonDown"
-                    Height="1000"
-                    Width="1000"
-                    Background="AliceBlue"/>
+          <ItemsControl
+               x:Name="Canvas"
+               ItemsSource="{Binding PhysicalObjects, UpdateSourceTrigger=PropertyChanged}">
+               <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                         <Canvas
+                              MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
+                              MouseRightButtonDown="Canvas_MouseRightButtonDown"
+                              MinWidth="500"
+                              MinHeight="500"
+                              Width="{Binding CanvasHeight}"
+                              Height="{Binding CanvasWidth}"
+                              Background="AliceBlue"/>
+                    </ItemsPanelTemplate>
+               </ItemsControl.ItemsPanel>
+               <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                         <TextBlock Text="{Binding Sprite}" />
+                    </DataTemplate>
+               </ItemsControl.ItemTemplate>
+               <ItemsControl.ItemContainerStyle>
+                    <Style>
+                         <Setter
+                              Property="Canvas.Left"
+                              Value="{Binding STPosition.Position.X}"/>
+                         <Setter
+                              Property="Canvas.Top"
+                              Value="{Binding STPosition.Position.Y}"/>
+                         <!--<Setter
+                              Property="Canvas.ZIndex"
+                              Value="{Binding STPosition.Position.Z, Converter={StaticResource ZToZIndex}}"/>-->
+                    </Style>
+               </ItemsControl.ItemContainerStyle>
           </ItemsControl>
      </Grid>
 </Window>

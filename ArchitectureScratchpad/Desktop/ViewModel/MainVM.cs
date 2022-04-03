@@ -16,6 +16,8 @@ namespace Desktop
           {
                UpdatePlayerTrajectoryCommand = new RelayCommand(UpdatePlayerTrajectory);
                ThrowSnowballCommand = new RelayCommand(ThrowSnowball, CanUpdateThrowsnowball);
+               Player = new Player();
+               PhysicalObjects.Add(Player);
           }
           public static MainVM Instance { get; } = new MainVM();
 
@@ -61,10 +63,11 @@ namespace Desktop
                }
           }
 
-          Canvas Canvas { get; set; }
+          public double CanvasWidth { get; set; } = 500;
+          public double CanvasHeight { get; set; } = 500;
 
-          public ObservableCollection<IPhysicalObject> PhysicalObjects { get; set; }
-               = new ObservableCollection<IPhysicalObject>();
+          public PresentationCollection<IPhysicalObject> PhysicalObjects { get; set; }
+               = new PresentationCollection<IPhysicalObject>(10);
 
           #endregion **************************************************************************************************
      }
