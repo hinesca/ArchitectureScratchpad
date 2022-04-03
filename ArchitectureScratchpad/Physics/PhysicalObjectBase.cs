@@ -4,7 +4,7 @@ namespace Physics
 {
      public class PhysicalObjectBase : IPhysicalObject
      {
-          public STPosition Position
+          public STPosition STPosition
           {
                get
                {

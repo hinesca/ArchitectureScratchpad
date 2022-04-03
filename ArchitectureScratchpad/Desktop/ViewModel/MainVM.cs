@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using Physics;
 
 namespace Desktop
@@ -24,13 +25,18 @@ namespace Desktop
 
           private void UpdatePlayerTrajectory(object o)
           {
-               Player.Trajectory = new Trajectory(TrajectoryType.Linear, Player.Position, Pla);
+               Player.Trajectory = new Trajectory(o as STPosition[]);
           }
 
           public RelayCommand ThrowSnowballCommand;
           private void ThrowSnowball(object o)
           {
-
+               STPosition target = o as STPosition;
+               double range = (target.Position - Player.STPosition.Position).Magnitude;
+               double speed = Player.MaxSnowballSpeed;
+               target.Time = DateTime.UtcNow.AddSeconds(speed / range);
+               STPosition[] path = new STPosition[] { Player.STPosition, target };
+               PhysicalObjects.Add(new SnowBall(path));
           }
           private bool CanUpdateThrowsnowball(object o)
           {
@@ -49,6 +55,8 @@ namespace Desktop
                     NotifyPropertyChanged();
                }
           }
+
+          Canvas Canvas { get; set; }
 
           public ObservableCollection<IPhysicalObject> PhysicalObjects { get; set; }
                = new ObservableCollection<IPhysicalObject>();

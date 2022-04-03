@@ -9,6 +9,7 @@
     <Grid>
           <ItemsControl ItemsSource="{Binding PhysicalObjects}">
                <Canvas
+                    x:Name="Canvas"
                     MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
                     MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
           </ItemsControl>

@@ -2,8 +2,9 @@
 {
      public class SnowBall : PhysicalObjectBase
      {
-          public SnowBall()
+          public SnowBall(STPosition[] path)
           {
+               Trajectory = new Trajectory(path);
                Sprite = 'o';
           }
      }
