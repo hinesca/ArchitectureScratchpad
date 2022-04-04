@@ -28,7 +28,7 @@ namespace Physics
                ParentTrajectory = parent;
                ParentOffset = parentOffset;
           }
-          
+
           public TrajectoryType TrajectoryType { get; set; }
           public STPosition[] Path { get; set; }
 
@@ -57,7 +57,7 @@ namespace Physics
                     DateTime now = DateTime.UtcNow;
                     if (_previousPointOnPath == null || _previousPointOnPath.Time > now)
                     {
-                         _previousPointOnPath = Path.LastOrDefault(p => p.Time > now);
+                         _previousPointOnPath = Path.LastOrDefault(p => p.Time < now);
                          if (_previousPointOnPath == null)
                               _previousPointOnPath = Path.Last();
                     }
@@ -65,6 +65,9 @@ namespace Physics
                }
           }
 
+          /// <summary>
+          /// This velocity is calculated as the average velocity between the next and previous positions.
+          /// </summary>
           public Vector Velocity
           {
                get
@@ -76,7 +79,9 @@ namespace Physics
                          return new Vector(); // Zero vector
 
                     TimeSpan interval = NextPointOnPath.Time - PreviousPointOnPath.Time;
-                    return NextPointOnPath.Position - PreviousPointOnPath.Position * (1 / interval.TotalSeconds);
+                    if (interval.TotalSeconds > 0)
+                         return NextPointOnPath.Position - PreviousPointOnPath.Position * (1 / interval.TotalSeconds);
+                    else return new Vector(); // Zero vector
                }
           }
 
@@ -115,8 +120,9 @@ namespace Physics
                     return new STPosition(trajectory.Path.Last().Position, now);
 
                TimeSpan interval = now - trajectory.PreviousPointOnPath.Time;
+               Vector velocity = trajectory.Velocity;
                return new STPosition(trajectory.PreviousPointOnPath.Position
-                    + trajectory.Velocity * interval.TotalSeconds, now);
+                    + velocity * interval.TotalSeconds, now);
           }
 
           private static STPosition GetOffsetPosition(Trajectory trajectory)
