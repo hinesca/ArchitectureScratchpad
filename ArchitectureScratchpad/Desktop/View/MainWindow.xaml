@@ -3,22 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Desktop"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid
+         Width="{Binding CanvasWidth}"
+         Height="{Binding CanvasHeight}">
           <ItemsControl
                x:Name="Canvas"
-               ItemsSource="{Binding PhysicalObjects, UpdateSourceTrigger=PropertyChanged}">
+               ItemsSource="{Binding PhysicalObjects, Mode=TwoWay}">
                <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                          <Canvas
                               MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                              MouseRightButtonDown="Canvas_MouseRightButtonDown"
-                              MinWidth="500"
-                              MinHeight="500"
-                              Width="{Binding CanvasHeight}"
-                              Height="{Binding CanvasWidth}"
+                              MouseRightButtonUp="Canvas_MouseRightButtonUp"
+                              Width="{Binding CanvasWidth}"
+                              Height="{Binding CanvasHeight}"
+                              VerticalAlignment="Stretch"
                               Background="AliceBlue"/>
                     </ItemsPanelTemplate>
                </ItemsControl.ItemsPanel>
@@ -31,10 +31,10 @@
                     <Style>
                          <Setter
                               Property="Canvas.Left"
-                              Value="{Binding STPosition.Position.X}"/>
+                              Value="{Binding ViewportX}"/>
                          <Setter
                               Property="Canvas.Top"
-                              Value="{Binding STPosition.Position.Y}"/>
+                              Value="{Binding ViewportY}"/>
                          <!--<Setter
                               Property="Canvas.ZIndex"
                               Value="{Binding STPosition.Position.Z, Converter={StaticResource ZToZIndex}}"/>-->

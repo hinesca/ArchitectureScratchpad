@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using Physics;
 
 namespace Desktop
@@ -28,10 +22,12 @@ namespace Desktop
           private void UpdatePlayerTrajectory(object o)
           {
                STPosition target = o as STPosition;
-               double range = (target.Position - Player.STPosition.Position).Magnitude;
+               STPosition origin = new STPosition(Player.STPosition);
+               double range = (target.Position - Player.STPosition.Position).Magnitude / 10;
                double speed = Player.MaxPlayerSpeed;
-               target.Time = DateTime.UtcNow.AddSeconds(speed / range);
-               STPosition[] path = new STPosition[] { Player.STPosition, target };
+               target.Time = DateTime.UtcNow.AddSeconds(range / speed);
+               //origin.Next = target;
+               STPosition[] path = new STPosition[] { origin, target };
                Player.Trajectory = new Trajectory(path);
           }
 
@@ -39,10 +35,12 @@ namespace Desktop
           private void ThrowSnowball(object o)
           {
                STPosition target = o as STPosition;
-               double range = (target.Position - Player.STPosition.Position).Magnitude;
+               STPosition origin = new STPosition(Player.STPosition);
+               double range = (target.Position - Player.STPosition.Position).Magnitude / 10;
                double speed = Player.MaxSnowballSpeed;
-               target.Time = DateTime.UtcNow.AddSeconds(speed / range);
-               STPosition[] path = new STPosition[] { Player.STPosition, target };
+               target.Time = DateTime.UtcNow.AddSeconds(range / speed);
+               //origin.Next = target;
+               STPosition[] path = new STPosition[] { origin, target };
                PhysicalObjects.Add(new SnowBall(path));
           }
           private bool CanUpdateThrowsnowball(object o)
@@ -67,7 +65,7 @@ namespace Desktop
           public double CanvasHeight { get; set; } = 500;
 
           public PresentationCollection<IPhysicalObject> PhysicalObjects { get; set; }
-               = new PresentationCollection<IPhysicalObject>(10);
+               = new PresentationCollection<IPhysicalObject>(100);
 
           #endregion **************************************************************************************************
      }
