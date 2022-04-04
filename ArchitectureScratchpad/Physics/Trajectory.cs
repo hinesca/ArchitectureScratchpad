@@ -40,27 +40,28 @@ namespace Physics
                     DateTime now = DateTime.UtcNow;
                     if (_nextPointOnPath == null || _nextPointOnPath.Time < now)
                     {
+                         // get the first point in the future
                          _nextPointOnPath = Path.FirstOrDefault(p => p.Time > now);
                          if (_nextPointOnPath == null)
-                              _nextPointOnPath = Path.Last();
+                              _nextPointOnPath = Path.Last().Next; // .Next will generate a new point in the future
                     }
                     return _nextPointOnPath;
                }
           }
 
-          private STPosition _lastPointOnPath;
+          private STPosition _previousPointOnPath;
           public STPosition PreviousPointOnPath
           {
                get
                {
                     DateTime now = DateTime.UtcNow;
-                    if (_lastPointOnPath == null || _lastPointOnPath.Time < now)
+                    if (_previousPointOnPath == null || _previousPointOnPath.Time > now)
                     {
-                         _lastPointOnPath = Path.LastOrDefault(p => p.Time > now);
-                         if (_lastPointOnPath == null)
-                              _lastPointOnPath = Path.Last();
+                         _previousPointOnPath = Path.LastOrDefault(p => p.Time > now);
+                         if (_previousPointOnPath == null)
+                              _previousPointOnPath = Path.Last();
                     }
-                    return _lastPointOnPath;
+                    return _previousPointOnPath;
                }
           }
 
@@ -74,7 +75,7 @@ namespace Physics
                     if (now > Path.Last().Time)
                          return new Vector(); // Zero vector
 
-                         TimeSpan interval = NextPointOnPath.Time - PreviousPointOnPath.Time;
+                    TimeSpan interval = NextPointOnPath.Time - PreviousPointOnPath.Time;
                     return NextPointOnPath.Position - PreviousPointOnPath.Position * (1 / interval.TotalSeconds);
                }
           }
@@ -92,7 +93,7 @@ namespace Physics
                switch (trajectory.TrajectoryType)
                {
                     case TrajectoryType.Grounded:
-                         return trajectory.Path[0];
+                         return new STPosition(trajectory.Path[0]);
                     case TrajectoryType.Linear:
                          return GetPositionOnPath(trajectory);
                     case TrajectoryType.Path:
@@ -114,7 +115,8 @@ namespace Physics
                     return new STPosition(trajectory.Path.Last().Position, now);
 
                TimeSpan interval = now - trajectory.PreviousPointOnPath.Time;
-               return new STPosition(trajectory.PreviousPointOnPath.Position + trajectory.Velocity * interval.TotalSeconds, now);
+               return new STPosition(trajectory.PreviousPointOnPath.Position
+                    + trajectory.Velocity * interval.TotalSeconds, now);
           }
 
           private static STPosition GetOffsetPosition(Trajectory trajectory)

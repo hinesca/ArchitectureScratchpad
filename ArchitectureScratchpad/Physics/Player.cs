@@ -8,7 +8,7 @@
                Sprite = '\u2603';
           }
           
-          public double MaxPlayerSpeed { get; set; } = 10;
-          public double MaxSnowballSpeed { get; set; } = 100;
+          public double MaxPlayerSpeed { get; set; } = 1;
+          public double MaxSnowballSpeed { get; set; } = 10;
      }
 }
