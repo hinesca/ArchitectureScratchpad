@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Physics
 {
@@ -14,9 +13,9 @@ namespace Physics
                Z = z;
           }
 
-          private double[] _backingArray = new double[] {0, 0, 0};
+          private double[] _backingArray = new double[] { 0, 0, 0 };
           public double X
-          { 
+          {
                get { return _backingArray[0]; }
                set { _backingArray[0] = value; }
           }
@@ -48,32 +47,40 @@ namespace Physics
                get { return Math.Sqrt(X * X + Y * Y + Z * Z); }
           }
 
-          public int Count => throw new NotImplementedException();
+          public static Vector operator +(Vector v) => v;
+          public static Vector operator -(Vector v) => new Vector(-v.X, -v.Y, -v.Z);
+          public static Vector operator +(Vector v, Vector u)
+              => new Vector(v.X + u.X, u.Y + v.Y, v.Z + u.Z);
 
-          public bool IsSynchronized => throw new NotImplementedException();
+          public static Vector operator -(Vector v, Vector u)
+              => v + (-u);
 
-          public object SyncRoot => throw new NotImplementedException();
+          /// <summary>
+          /// Dot product of two vectors
+          /// </summary>
+          /// <param name="v"></param>
+          /// <param name="u"></param>
+          /// <returns></returns>
+          public static double operator *(Vector v, Vector u)
+              => v.X * u.X + v.Y * u.Y + v.Z * u.Z;
 
-          public bool IsReadOnly => throw new NotImplementedException();
+          public static Vector operator *(Vector v, double s)
+              => new Vector(v.X * s, v.Y * s, v.Z);
 
-          public static Vector operator +(Vector a) => a;
-          public static Vector operator -(Vector a) => new Vector(-a.X, -a.Y, -a.Z);
-          public static Vector operator +(Vector a, Vector b)
-              => new Vector(a.X + b.X, b.Y + a.Y, a.Z + b.Z);
-
-          public static Vector operator -(Vector a, Vector b)
-              => a + (-b);
-
-          public static Vector operator *(Vector a, Vector b)
-              => throw new NotImplementedException();//new Vector(a.X * b.X, a.Y * b.Y, a.Z * a.Z);
-
-          public static Vector operator *(Vector a, double s)
-              => new Vector(a.X * s, a.Y * s, a.Z);
+          public static Vector Cross(Vector v, Vector u)
+          {
+               throw new NotImplementedException("Cross product not implemented");
+          }
 
 
           public override string ToString() => $"({X}, {Y}, {Z})";
 
           public IEnumerator GetEnumerator()
+          {
+               yield return _backingArray;
+          }
+
+          IEnumerator<double> IEnumerable<double>.GetEnumerator()
           {
                yield return X;
                yield return Y;
@@ -82,16 +89,7 @@ namespace Physics
 
           public void Clear()
           {
-               X = 0;
-               Y = 0;
-               Z = 0;
-          }
-
-          IEnumerator<double> IEnumerable<double>.GetEnumerator()
-          {
-               yield return X;
-               yield return Y;
-               yield return Z;
+               _backingArray = new double[] { 0, 0, 0 };
           }
      }
 }
