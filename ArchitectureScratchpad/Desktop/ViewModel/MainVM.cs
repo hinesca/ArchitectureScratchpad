@@ -25,13 +25,16 @@ namespace Desktop
           #region ***************************************** Logic *****************************************************
           public RelayCommand UpdatePlayerTrajectoryCommand;
 
+
           private void UpdatePlayerTrajectory(object o)
           {
                STPosition target = o as STPosition;
-               double range = (target.Position - Player.STPosition.Position).Magnitude;
+               STPosition origin = new STPosition(Player.STPosition);
+               double range = (target.Position - Player.STPosition.Position).Magnitude / 10;
                double speed = Player.MaxPlayerSpeed;
-               target.Time = DateTime.UtcNow.AddSeconds(speed / range);
-               STPosition[] path = new STPosition[] { Player.STPosition, target };
+               target.Time = DateTime.UtcNow.AddSeconds(range / speed);
+               //origin.Next = target;
+               STPosition[] path = new STPosition[] { origin, target };
                Player.Trajectory = new Trajectory(path);
           }
 
@@ -39,12 +42,15 @@ namespace Desktop
           private void ThrowSnowball(object o)
           {
                STPosition target = o as STPosition;
-               double range = (target.Position - Player.STPosition.Position).Magnitude;
+               STPosition origin = new STPosition(Player.STPosition);
+               double range = (target.Position - Player.STPosition.Position).Magnitude / 10;
                double speed = Player.MaxSnowballSpeed;
-               target.Time = DateTime.UtcNow.AddSeconds(speed / range);
-               STPosition[] path = new STPosition[] { Player.STPosition, target };
+               target.Time = DateTime.UtcNow.AddSeconds(range / speed);
+               //origin.Next = target;
+               STPosition[] path = new STPosition[] { origin, target };
                PhysicalObjects.Add(new SnowBall(path));
           }
+
           private bool CanUpdateThrowsnowball(object o)
           {
                return true; // Keep simple for now. This is equivalent to a null predicate. 

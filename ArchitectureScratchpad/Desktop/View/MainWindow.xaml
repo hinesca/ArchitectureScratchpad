@@ -14,7 +14,7 @@
                     <ItemsPanelTemplate>
                          <Canvas
                               MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                              MouseRightButtonDown="Canvas_MouseRightButtonDown"
+                              MouseRightButtonDown="Canvas_MouseRightButtonUp"
                               MinWidth="500"
                               MinHeight="500"
                               Width="{Binding CanvasHeight}"
@@ -31,10 +31,10 @@
                     <Style>
                          <Setter
                               Property="Canvas.Left"
-                              Value="{Binding STPosition.Position.X}"/>
+                              Value="{Binding ViewportX}"/>
                          <Setter
                               Property="Canvas.Top"
-                              Value="{Binding STPosition.Position.Y}"/>
+                              Value="{Binding ViewportY}"/>
                          <!--<Setter
                               Property="Canvas.ZIndex"
                               Value="{Binding STPosition.Position.Z, Converter={StaticResource ZToZIndex}}"/>-->

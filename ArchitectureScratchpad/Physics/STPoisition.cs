@@ -49,14 +49,12 @@ namespace Physics
                     if (_next == null)
                     {
                          _next = new STPosition(Position, now + TimeSpan.FromSeconds(1));
-                         return _next;
                     }
                     else if (_next.Time > now)
                     {
                          _next = _next.Next;
-                         return _next;
                     }
-                    else return _next;
+                    return _next;
                }
                set
                {
