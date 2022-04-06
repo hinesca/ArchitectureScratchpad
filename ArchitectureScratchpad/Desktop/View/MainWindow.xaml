@@ -3,28 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Desktop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow"
+        Width="{Binding CanvasWidth, Mode=TwoWay}"
+        Height="{Binding CanvasHeight, Mode=TwoWay}">
     <Grid>
           <ItemsControl
                x:Name="Canvas"
-               ItemsSource="{Binding PhysicalObjects, UpdateSourceTrigger=PropertyChanged}">
+               ItemsSource="{Binding PhysicalObjects, Mode=TwoWay}">
                <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                          <Canvas
                               MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                              MouseRightButtonDown="Canvas_MouseRightButtonUp"
-                              MinWidth="500"
-                              MinHeight="500"
-                              Width="{Binding CanvasHeight}"
-                              Height="{Binding CanvasWidth}"
+                              MouseRightButtonUp="Canvas_MouseRightButtonUp"
+                              Width="{Binding CanvasWidth, Mode=TwoWay}"
+                              Height="{Binding CanvasHeight, Mode=TwoWay}"
+                              VerticalAlignment="Stretch"
                               Background="AliceBlue"/>
                     </ItemsPanelTemplate>
                </ItemsControl.ItemsPanel>
                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                         <TextBlock Text="{Binding Sprite}" />
+                         <TextBlock Text="{Binding Sprite}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </DataTemplate>
                </ItemsControl.ItemTemplate>
                <ItemsControl.ItemContainerStyle>

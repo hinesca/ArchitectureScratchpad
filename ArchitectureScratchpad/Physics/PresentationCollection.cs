@@ -1,12 +1,12 @@
-﻿using Physics;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace Desktop
+namespace Physics
 {
-     public class PresentationCollection<T> : ObservableCollection<T>, IDisposable
+     public class PresentationCollection : ObservableCollection<IPhysicalObject>, IDisposable
      {
           public PresentationCollection(int refreshIntervalMs) : base()
           {
@@ -29,16 +29,34 @@ namespace Desktop
           {
                while (Instantiated)
                {
+                    int i = 0;
                     while (Presenting)
                     {
+                         if (i == 10)
+                         {
+                              ClearDeadWood();
+                              i = 0;
+                         }
                          await Task.Delay(refreshIntervalMs);
                          OnCollectionChanged(
                               new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                         i++;
                     }
                     await Task.Delay(1000);
                }
 
                Dispose();
+          }
+
+          private void ClearDeadWood()
+          {
+               DateTime now = DateTime.UtcNow;
+               IPhysicalObject[] items = Items.ToArray();
+               foreach (IPhysicalObject po in items)
+               {
+                    if (now > po.EOL)
+                         Remove(po);
+               }
           }
 
           public void Dispose()

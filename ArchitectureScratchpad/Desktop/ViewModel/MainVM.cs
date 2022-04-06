@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using Physics;
 
 namespace Desktop
@@ -18,6 +12,7 @@ namespace Desktop
                ThrowSnowballCommand = new RelayCommand(ThrowSnowball, CanUpdateThrowsnowball);
                Player = new Player();
                PhysicalObjects.Add(Player);
+               PhysicalObjects.Add(new SwatBot(Player, PhysicalObjects));
           }
           public static MainVM Instance { get; } = new MainVM();
 
@@ -30,10 +25,10 @@ namespace Desktop
           {
                STPosition target = o as STPosition;
                STPosition origin = new STPosition(Player.STPosition);
-               double range = (target.Position - Player.STPosition.Position).Magnitude / 10;
+               double range = (target.Position - Player.STPosition.Position).Magnitude;
                double speed = Player.MaxPlayerSpeed;
                target.Time = DateTime.UtcNow.AddSeconds(range / speed);
-               //origin.Next = target;
+               origin.Next = target;
                STPosition[] path = new STPosition[] { origin, target };
                Player.Trajectory = new Trajectory(path);
           }
@@ -41,14 +36,9 @@ namespace Desktop
           public RelayCommand ThrowSnowballCommand;
           private void ThrowSnowball(object o)
           {
-               STPosition target = o as STPosition;
-               STPosition origin = new STPosition(Player.STPosition);
-               double range = (target.Position - Player.STPosition.Position).Magnitude / 10;
-               double speed = Player.MaxSnowballSpeed;
-               target.Time = DateTime.UtcNow.AddSeconds(range / speed);
-               //origin.Next = target;
-               STPosition[] path = new STPosition[] { origin, target };
-               PhysicalObjects.Add(new SnowBall(path));
+               PhysicalObjects.Add(
+                    SnowBall.ThrowSnowball(
+                         new STPosition(Player.STPosition), o as STPosition, Player.MaxSnowballSpeed));
           }
 
           private bool CanUpdateThrowsnowball(object o)
@@ -69,11 +59,30 @@ namespace Desktop
                }
           }
 
-          public double CanvasWidth { get; set; } = 500;
-          public double CanvasHeight { get; set; } = 500;
+          private double _canvasWidth = 500;
+          public double CanvasWidth
+          {
+               get { return _canvasWidth; }
+               set
+               { 
+                    _canvasWidth = value;
+                    NotifyPropertyChanged();
+               }
+          }
 
-          public PresentationCollection<IPhysicalObject> PhysicalObjects { get; set; }
-               = new PresentationCollection<IPhysicalObject>(10);
+          private double _canvasHeight = 500;
+          public double CanvasHeight
+          {
+               get { return _canvasHeight; }
+               set
+               { 
+                    _canvasHeight = value;
+                    NotifyPropertyChanged();
+               }
+          }
+
+          public PresentationCollection PhysicalObjects { get; set; }
+               = new PresentationCollection(10);
 
           #endregion **************************************************************************************************
      }
