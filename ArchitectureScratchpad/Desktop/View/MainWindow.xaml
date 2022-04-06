@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid
-         Width="{Binding CanvasWidth}"
-         Height="{Binding CanvasHeight}">
+        Title="MainWindow"
+        Width="{Binding CanvasWidth, Mode=TwoWay}"
+        Height="{Binding CanvasHeight, Mode=TwoWay}">
+    <Grid>
           <ItemsControl
                x:Name="Canvas"
                ItemsSource="{Binding PhysicalObjects, Mode=TwoWay}">
@@ -16,15 +16,15 @@
                          <Canvas
                               MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
                               MouseRightButtonUp="Canvas_MouseRightButtonUp"
-                              Width="{Binding CanvasWidth}"
-                              Height="{Binding CanvasHeight}"
+                              Width="{Binding CanvasWidth, Mode=TwoWay}"
+                              Height="{Binding CanvasHeight, Mode=TwoWay}"
                               VerticalAlignment="Stretch"
                               Background="AliceBlue"/>
                     </ItemsPanelTemplate>
                </ItemsControl.ItemsPanel>
                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                         <TextBlock Text="{Binding Sprite}" />
+                         <TextBlock Text="{Binding Sprite}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </DataTemplate>
                </ItemsControl.ItemTemplate>
                <ItemsControl.ItemContainerStyle>

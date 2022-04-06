@@ -10,7 +10,7 @@ namespace Physics
                get
                {
                     DateTime now = DateTime.UtcNow;
-                    if (_stPosition == null || _stPosition.Time > now + TimeSpan.FromMilliseconds(10))
+                    if (_stPosition == null || _stPosition.Time < now + TimeSpan.FromMilliseconds(10))
                          _stPosition = Trajectory.GetPosition();
                     return _stPosition;
                }
@@ -27,6 +27,7 @@ namespace Physics
           }
 
           public Trajectory Trajectory { get; set; }
+          public DateTime EOL { get; set; }
           public object Sprite { get; set; }
           public IPhysicalObject Parent { get; set; }
      }

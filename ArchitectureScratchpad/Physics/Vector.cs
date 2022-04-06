@@ -50,7 +50,7 @@ namespace Physics
           public static Vector operator +(Vector v) => v;
           public static Vector operator -(Vector v) => new Vector(-v.X, -v.Y, -v.Z);
           public static Vector operator +(Vector v, Vector u)
-              => new Vector(v.X + u.X, u.Y + v.Y, v.Z + u.Z);
+              => new Vector(v.X + u.X, v.Y + u.Y, v.Z + u.Z);
 
           public static Vector operator -(Vector v, Vector u)
               => v + (-u);
