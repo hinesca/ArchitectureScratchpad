@@ -1,5 +1,4 @@
-﻿using System;
-using Physics;
+﻿using Physics;
 
 namespace Desktop
 {
@@ -10,35 +9,25 @@ namespace Desktop
           {
                UpdatePlayerTrajectoryCommand = new RelayCommand(UpdatePlayerTrajectory);
                ThrowSnowballCommand = new RelayCommand(ThrowSnowball, CanUpdateThrowsnowball);
-               Player = new Player();
-               PhysicalObjects.Add(Player);
-               PhysicalObjects.Add(new SwatBot(Player, PhysicalObjects));
+               Player = new Player(PhysicalObjects);
+               Player swatBot = new SwatBot(Player, PhysicalObjects);
           }
           public static MainVM Instance { get; } = new MainVM();
 
           #endregion **************************************************************************************************
           #region ***************************************** Logic *****************************************************
-          public RelayCommand UpdatePlayerTrajectoryCommand;
 
+          public RelayCommand UpdatePlayerTrajectoryCommand;
 
           private void UpdatePlayerTrajectory(object o)
           {
-               STPosition target = o as STPosition;
-               STPosition origin = new STPosition(Player.STPosition);
-               double range = (target.Position - Player.STPosition.Position).Magnitude;
-               double speed = Player.MaxPlayerSpeed;
-               target.Time = DateTime.UtcNow.AddSeconds(range / speed);
-               origin.Next = target;
-               STPosition[] path = new STPosition[] { origin, target };
-               Player.Trajectory = new Trajectory(path);
+               Player.UpdateTrajectory(o as Vector);
           }
 
           public RelayCommand ThrowSnowballCommand;
           private void ThrowSnowball(object o)
           {
-               PhysicalObjects.Add(
-                    SnowBall.ThrowSnowball(
-                         new STPosition(Player.STPosition), o as STPosition, Player.MaxSnowballSpeed));
+               Player.ThrowSnowball(o as Vector);
           }
 
           private bool CanUpdateThrowsnowball(object o)
@@ -48,23 +37,15 @@ namespace Desktop
 
           #endregion **************************************************************************************************
           #region ***************************************** Properties ************************************************
-          private Player _player = new Player();
-          public Player Player
-          {
-               get { return _player; }
-               set
-               { 
-                    _player = value;
-                    NotifyPropertyChanged();
-               }
-          }
+
+          public Player Player { get; }
 
           private double _canvasWidth = 500;
           public double CanvasWidth
           {
                get { return _canvasWidth; }
                set
-               { 
+               {
                     _canvasWidth = value;
                     NotifyPropertyChanged();
                }

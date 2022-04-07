@@ -1,72 +1,66 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Physics
 {
-     public class SwatBot : PhysicalObjectBase
+     public class SwatBot : Player
      {
           /// <summary>
           /// TODO Lazy implementation. Change.
           /// </summary>
-          public SwatBot(Player player, PresentationCollection presentor)
+          public SwatBot(Player player, PresentationCollection presenter) : base (presenter)
           {
                HoastPlayer = player;
-               HoastPresentor = presentor;
                Sprite = '\u2603';
                EOL = DateTime.MaxValue;
                StartAsync();
           }
 
-          private static readonly Random _random = new Random();
-
           private async void StartAsync()
           {
                int snowballThrowCount = 0;
-               Trajectory = new Trajectory(GetPath(HoastPlayer.STPosition.Position));
-               int nextChange = 5 + _random.Next(15); // 5 - 20 throws of the snowball
+               ChangeTrajectory();
+               int nextChange = 2 + _random.Next(3); // 2 - 5 throws of the snowball
 
                while (DateTime.UtcNow < EOL)
                {
-                    int awaitMs = 500 + _random.Next(1500); // 0.5 - 2 seconds
+                    // when effectivnessModifyer reaches zero @ 100 hits, bot throws a snowball every 0.2 seconds
+                    int effectivnessModifyer = 1000 - 10 * HoastPlayer.OutgoingHits;
+                    if (effectivnessModifyer < 0)
+                         effectivnessModifyer = 0;
+
+                    int awaitMs = 200 + _random.Next(2 * effectivnessModifyer); // 0.2 - 2 seconds
                     await Task.Delay(awaitMs);
-                    ThrowSnowball();
-                    if (snowballThrowCount % nextChange == 0)
+                    Vector lead = CalculateLead(this, HoastPlayer, SnowballSpeed);
+                    ThrowSnowball(HoastPlayer.STPosition.Position + lead);
+                    snowballThrowCount++;
+                    if (snowballThrowCount == nextChange)
                     {
-                         Trajectory = new Trajectory(GetPath());
-                         nextChange = 5 + _random.Next(15); // 5 - 20 throws of the snowball
+                         ChangeTrajectory();
+                         nextChange = 3 + _random.Next(50 / (1 + effectivnessModifyer));
                          snowballThrowCount = 0;
                     }
                }
           }
 
-          private STPosition[] GetPath()
+          public static Vector CalculateLead(IPhysicalObject origin, IPhysicalObject target, double interceptorSpeed)
+          {
+               Vector targetVelocity = target.Trajectory.Velocity;
+               Vector targetVector = origin.STPosition.Position - target.STPosition.Position;
+               double tot = targetVector.Magnitude / interceptorSpeed;
+               Vector lead = targetVelocity * tot;
+               // also aim a bit down range from target
+               lead = lead - 0.2 * targetVector;
+               return lead;
+          }
+
+          private void ChangeTrajectory()
           {
                Vector p1 = HoastPlayer.STPosition.Position;
-               Vector p2 = new Vector(p1.X + Randouble(100), p1.Y + Randouble(100));
-               return new STPosition[] { STPosition, new STPosition(p2, TimeSpan.FromSeconds(3)) };
+               Vector target = new Vector(p1.X + _random.Randouble(300), p1.Y + _random.Randouble(300));
+               UpdateTrajectory(target);
           }
-
-          private STPosition[] GetPath(Vector p0)
-          {
-               Vector p1 = new Vector(p0.X + Randouble(100), p0.Y + Randouble(100));
-               Vector p2 = new Vector(p1.X + Randouble(100), p1.Y + Randouble(100));
-               return new STPosition[] { new STPosition(p1), new STPosition(p2, TimeSpan.FromSeconds(3)) };
-          }
-
-          // TODO make random library
-          private double Randouble(double pmRange)
-          {
-               return (-1 + 2 * _random.NextDouble()) * pmRange;
-          }
-
-          private void ThrowSnowball()
-          {
-               Vector p1 = new Vector(Randouble(10), Randouble(10));
-               STPosition target = new STPosition(HoastPlayer.STPosition.Position + p1);
-               HoastPresentor.Add(SnowBall.ThrowSnowball(STPosition, target, HoastPlayer.MaxSnowballSpeed));
-          }
-
-          PresentationCollection HoastPresentor { get; }
 
           Player HoastPlayer { get; }
      }

@@ -36,8 +36,8 @@ namespace Physics
                set { _backingArray[index] = value; }
           }
 
-          // TODO check the math, finish implementation
-          public Vector Normalized()
+          // TODO check the math below, finish implementation
+          public Vector Unit()
           {
                return this * (1 / Magnitude);
           }
@@ -65,6 +65,9 @@ namespace Physics
               => v.X * u.X + v.Y * u.Y + v.Z * u.Z;
 
           public static Vector operator *(Vector v, double s)
+              => new Vector(v.X * s, v.Y * s, v.Z);
+
+          public static Vector operator *(double s, Vector v)
               => new Vector(v.X * s, v.Y * s, v.Z);
 
           public static Vector Cross(Vector v, Vector u)

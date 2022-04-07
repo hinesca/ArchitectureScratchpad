@@ -1,6 +1,4 @@
-﻿using Physics;
-using System;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Desktop
 {
@@ -22,9 +20,7 @@ namespace Desktop
                if (VM.ThrowSnowballCommand.CanExecute(null))
                {
                     Point mousePoint = e.GetPosition(Canvas);
-                    STPosition target = new STPosition(
-                         new Physics.Vector(mousePoint.X, mousePoint.Y, 0), DateTime.UtcNow);
-                    VM.ThrowSnowballCommand.Execute(target);
+                    VM.ThrowSnowballCommand.Execute(new Physics.Vector(mousePoint.X, mousePoint.Y, 0));
                }
           }
 
@@ -33,9 +29,7 @@ namespace Desktop
                if (VM.UpdatePlayerTrajectoryCommand.CanExecute(null))
                {
                     Point mousePoint = e.GetPosition(Canvas);
-                    STPosition target = new STPosition(
-                         new Physics.Vector(mousePoint.X, mousePoint.Y, 0), DateTime.UtcNow);
-                    VM.UpdatePlayerTrajectoryCommand.Execute(target);
+                    VM.UpdatePlayerTrajectoryCommand.Execute(new Physics.Vector(mousePoint.X, mousePoint.Y, 0));
                }
           }
      }

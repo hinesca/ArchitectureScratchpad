@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Physics
@@ -7,13 +8,15 @@ namespace Physics
      {
           public Trajectory(STPosition position)
           {
-               Path = new STPosition[] { position };
+               PathForward = new List<STPosition> { position };
+               _previousPointOnPath = position;
                TrajectoryType = TrajectoryType.Grounded;
           }
 
-          public Trajectory(STPosition[] path)
+          public Trajectory(List<STPosition> path)
           {
-               Path = path;
+               PathForward = path;
+               _previousPointOnPath = path[0];
                TrajectoryType = TrajectoryType.Path;
           }
 
@@ -21,10 +24,24 @@ namespace Physics
           {
                ParentTrajectory = parent;
                ParentOffset = parentOffset;
+               TrajectoryType = TrajectoryType.Offset;
           }
 
           public TrajectoryType TrajectoryType { get; set; }
-          public STPosition[] Path { get; set; }
+          public List<STPosition> PathForward { get; set; }
+
+          private STPosition _pathEndPoint;
+          public STPosition PathEndPoint
+          {
+               get
+               {
+                    DateTime now = DateTime.UtcNow;
+                    if (_pathEndPoint == null || _pathEndPoint.Time > now)
+                         _pathEndPoint = NextPointOnPath;
+
+                    return _pathEndPoint;
+               }
+          }
 
           private STPosition _nextPointOnPath;
           public STPosition NextPointOnPath
@@ -35,9 +52,13 @@ namespace Physics
                     if (_nextPointOnPath == null || _nextPointOnPath.Time < now)
                     {
                          // get the first point in the future
-                         _nextPointOnPath = Path.FirstOrDefault(p => p.Time > now);
-                         if (_nextPointOnPath == null)
-                              _nextPointOnPath = Path.Last().Next; // .Next will generate a new point in the future
+                         _nextPointOnPath = PathForward.FirstOrDefault(p => p.Time > now);
+                         if (_nextPointOnPath == null) // generate new position in future
+                         {
+                              _nextPointOnPath
+                                   = new STPosition(PathEndPoint.Position, now + TimeSpan.FromMilliseconds(10));
+                              PathForward.Add(_nextPointOnPath);
+                         }
                     }
                     return _nextPointOnPath;
                }
@@ -49,9 +70,16 @@ namespace Physics
                get
                {
                     DateTime now = DateTime.UtcNow;
-                    if (_previousPointOnPath == null || _previousPointOnPath.Time > now)
+                    STPosition[] path = PathForward.ToArray();
+                    
+                    for (int i = 0; i < path.Length; i++)
                     {
-                         _previousPointOnPath = Path.LastOrDefault(p => p.Time < now);
+                         if (path[i].Time < now)
+                         {
+                              _previousPointOnPath = path[i];
+                              PathForward.Remove(_previousPointOnPath);
+                         }
+                         else return _previousPointOnPath;
                     }
                     return _previousPointOnPath;
                }
@@ -67,12 +95,14 @@ namespace Physics
                     // TODO: Review
                     DateTime now = DateTime.UtcNow;
 
-                    if (now > Path.Last().Time)
+                    if (now > PathEndPoint.Time)
                          return new Vector(); // Zero vector
 
-                    TimeSpan interval = NextPointOnPath.Time - PreviousPointOnPath.Time;
+                    STPosition next = NextPointOnPath;
+                    STPosition previous = PreviousPointOnPath;
+                    TimeSpan interval = next.Time - previous.Time;
                     if (interval.TotalSeconds > 0)
-                         return (NextPointOnPath.Position - PreviousPointOnPath.Position) * (1 / interval.TotalSeconds);
+                         return (next.Position - previous.Position) * (1 / interval.TotalSeconds);
                     else return new Vector(); // Zero vector
                }
           }
@@ -90,7 +120,7 @@ namespace Physics
                switch (trajectory.TrajectoryType)
                {
                     case TrajectoryType.Grounded:
-                         return new STPosition(trajectory.Path[0]);
+                         return new STPosition(trajectory.PathForward[0]);
                     case TrajectoryType.Path:
                          return GetPositionOnPath(trajectory);
                     case TrajectoryType.Offset:
@@ -106,12 +136,12 @@ namespace Physics
           {
                DateTime now = DateTime.UtcNow;
 
-               if (now > trajectory.Path.Last().Time)
-                    return new STPosition(trajectory.Path.Last().Position, now);
+               if (now > trajectory.PathEndPoint.Time)
+                    return new STPosition(trajectory.PathEndPoint.Position, now);
 
                TimeSpan interval = now - trajectory.PreviousPointOnPath.Time;
                Vector velocity = trajectory.Velocity;
-               double speed = velocity.Magnitude; // DEBUG TODO remove
+               double speed = velocity.Magnitude; // TODO incorporate into uncertainty or remove
                return new STPosition(trajectory.PreviousPointOnPath.Position + velocity * interval.TotalSeconds, now);
           }
 

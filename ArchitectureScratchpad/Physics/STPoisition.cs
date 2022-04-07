@@ -40,35 +40,7 @@ namespace Physics
 
           public Vector Position { get; set; }
           public DateTime Time { get; set; }
-          public double PositionUncertainty { get; set; } = 0;
-          public double TimeUncertainty { get; set; } = 0;
-
-          private STPosition _next;
-          /// <summary>
-          /// Returns the next position in time and space.
-          /// A new position will be generated in the future if one does not exist.
-          /// </summary>
-          public STPosition Next
-          {
-               get
-               {
-                    DateTime now = DateTime.UtcNow;
-                    if (_next == null)
-                    {
-                         _next = new STPosition(Position, now + TimeSpan.FromSeconds(1));
-                    }
-                    else if (_next.Time > now)
-                    {
-                         _next = _next.Next;
-                    }
-                    return _next;
-               }
-               set
-               {
-                    _next = value;
-               }
-          }
-
-          public STPosition Previous { get; set; }
+          public double UncertaintyS { get; set; } = 0;
+          public double UncertaintyTms { get; set; } = 0;
      }
 }

@@ -6,8 +6,9 @@
         mc:Ignorable="d"
         Title="MainWindow"
         Width="{Binding CanvasWidth, Mode=TwoWay}"
-        Height="{Binding CanvasHeight, Mode=TwoWay}">
-    <Grid>
+        Height="{Binding CanvasHeight, Mode=TwoWay}"
+        WindowState="Maximized">
+     <Grid>
           <ItemsControl
                x:Name="Canvas"
                ItemsSource="{Binding PhysicalObjects, Mode=TwoWay}">
@@ -19,12 +20,16 @@
                               Width="{Binding CanvasWidth, Mode=TwoWay}"
                               Height="{Binding CanvasHeight, Mode=TwoWay}"
                               VerticalAlignment="Stretch"
-                              Background="AliceBlue"/>
+                              Background="AliceBlue">
+                         </Canvas>
                     </ItemsPanelTemplate>
                </ItemsControl.ItemsPanel>
                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                         <TextBlock Text="{Binding Sprite}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                         <TextBlock
+                              Text="{Binding Sprite}"
+                              FontSize="{Binding SpriteSize}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </DataTemplate>
                </ItemsControl.ItemTemplate>
                <ItemsControl.ItemContainerStyle>
@@ -41,5 +46,15 @@
                     </Style>
                </ItemsControl.ItemContainerStyle>
           </ItemsControl>
+          <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Height="20">
+               <TextBlock Text="Score: " FontWeight="Bold"/>
+               <TextBlock Text="{Binding Player.Score}" FontWeight="Bold"/>
+               <TextBlock Text=" Effectiveness: "/>
+               <TextBlock Text="{Binding Player.Effectiveness}"/>
+               <TextBlock Text=" outgoing hits: "/>
+               <TextBlock Text="{Binding Player.OutgoingHits}"/>
+               <TextBlock Text=" incoming hits: "/>
+               <TextBlock Text="{Binding Player.IncomingHits}"/>
+          </StackPanel>
      </Grid>
 </Window>

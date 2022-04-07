@@ -1,61 +1,68 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Physics
 {
-     public class PresentationCollection : ObservableCollection<IPhysicalObject>, IDisposable
+     public class PresentationCollection : List<IPhysicalObject>, INotifyCollectionChanged, IDisposable //ObservableCollection<IPhysicalObject>
      {
           public PresentationCollection(int refreshIntervalMs) : base()
           {
-               PresentAsync(refreshIntervalMs);
+               Start(refreshIntervalMs);
           }
 
           private bool _disposed = false;
           public bool Instantiated { get; set; } = true;
           public bool Presenting { get; set; } = true;
 
-          public override event NotifyCollectionChangedEventHandler CollectionChanged;
+          public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-          protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+          protected  void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
           {
                if (CollectionChanged != null)
                     CollectionChanged.Invoke(this, e);
           }
 
-          private async void PresentAsync(int refreshIntervalMs)
+          private async void Start(int refreshIntervalMs)
           {
                while (Instantiated)
                {
-                    int i = 0;
-                    while (Presenting)
+                    while (Instantiated && Presenting)
                     {
-                         if (i == 10)
-                         {
-                              ClearDeadWood();
-                              i = 0;
-                         }
                          await Task.Delay(refreshIntervalMs);
+                         HitTest(ToArray());
                          OnCollectionChanged(
                               new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                         i++;
                     }
                     await Task.Delay(1000);
                }
-
                Dispose();
           }
 
-          private void ClearDeadWood()
+          public static void HitTest(IPhysicalObject[] collection) // TODO Move this somewhere else
           {
                DateTime now = DateTime.UtcNow;
-               IPhysicalObject[] items = Items.ToArray();
-               foreach (IPhysicalObject po in items)
+               for (int i = 0; i < collection.Length; i++)
                {
-                    if (now > po.EOL)
-                         Remove(po);
+                    IPhysicalObject poi = collection[i];
+                    if (now > poi.EOL)
+                    {
+                         poi.Dispose();
+                         continue;
+                    }
+
+                    Vector poiPos = poi.STPosition.Position;
+                    for (int j = i + 1; j < collection.Length; j++)
+                    {
+                         IPhysicalObject poj = collection[j];
+                         Vector pojPos = poj.STPosition.Position;
+                         if ((pojPos - poiPos).Magnitude < poi.UncertaintyS + poj.UncertaintyS)
+                         {
+                              poi.CollideWith(poj);
+                              poj.CollideWith(poi);
+                         }
+                    }
                }
           }
 
