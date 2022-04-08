@@ -6,7 +6,7 @@ namespace Physics
 {
      public class PhysicalObjectBase : IPhysicalObject, IDisposable, INotifyPropertyChanged
      {
-          public PhysicalObjectBase(PresentationCollection presenter)
+          public PhysicalObjectBase(RealTimeEngine presenter)
           {
                Presenter = presenter;
           }
@@ -27,12 +27,12 @@ namespace Physics
                }
           }
 
-          public virtual void CollideWith(IPhysicalObject o)
+          public virtual void Interact(IPhysicalObject o, DateTime now)
           {
                if (o.Equals(this))
                     return;
 
-               EventArgs args = new EventArgs();
+               EventArgs args = new EventArgs(); // TODO put now in new type of args (or don't use... will it be needed?)
                if (Hit != null)
                     Hit.Invoke(this, args);
           }
@@ -43,7 +43,7 @@ namespace Physics
                if (_disposed)
                     return;
                Presenter.Remove(this);
-               EOL = DateTime.UtcNow - TimeSpan.FromMilliseconds(100);
+               EOL = DateTime.UtcNow;
                _disposed = true;
           }
 
@@ -63,7 +63,7 @@ namespace Physics
           public DateTime EOL { get; set; }
           public object Sprite { get; set; }
           public IPhysicalObject Parent { get; set; }
-          public PresentationCollection Presenter { get; set; }
+          public RealTimeEngine Presenter { get; set; }
 
           public event PropertyChangedEventHandler PropertyChanged;
           /// <summary>

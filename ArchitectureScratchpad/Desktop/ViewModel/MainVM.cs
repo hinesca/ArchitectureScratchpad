@@ -10,7 +10,7 @@ namespace Desktop
                UpdatePlayerTrajectoryCommand = new RelayCommand(UpdatePlayerTrajectory);
                ThrowSnowballCommand = new RelayCommand(ThrowSnowball, CanUpdateThrowsnowball);
                Player = new Player(PhysicalObjects);
-               Player swatBot = new SwatBot(Player, PhysicalObjects);
+               SwatBot = new SwatBot(Player, PhysicalObjects);
           }
           public static MainVM Instance { get; } = new MainVM();
 
@@ -39,6 +39,7 @@ namespace Desktop
           #region ***************************************** Properties ************************************************
 
           public Player Player { get; }
+          public Player SwatBot { get; }
 
           private double _canvasWidth = 500;
           public double CanvasWidth
@@ -62,8 +63,8 @@ namespace Desktop
                }
           }
 
-          public PresentationCollection PhysicalObjects { get; set; }
-               = new PresentationCollection(10);
+          public RealTimeEngine PhysicalObjects { get; set; }
+               = new RealTimeEngine(5);
 
           #endregion **************************************************************************************************
      }

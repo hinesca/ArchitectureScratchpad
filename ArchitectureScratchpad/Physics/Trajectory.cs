@@ -56,7 +56,7 @@ namespace Physics
                          if (_nextPointOnPath == null) // generate new position in future
                          {
                               _nextPointOnPath
-                                   = new STPosition(PathEndPoint.Position, now + TimeSpan.FromMilliseconds(10));
+                                   = new STPosition(PathEndPoint.Position, DateTime.MaxValue);
                               PathForward.Add(_nextPointOnPath);
                          }
                     }

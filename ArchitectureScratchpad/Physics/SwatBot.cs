@@ -9,12 +9,13 @@ namespace Physics
           /// <summary>
           /// TODO Lazy implementation. Change.
           /// </summary>
-          public SwatBot(Player player, PresentationCollection presenter) : base (presenter)
+          public SwatBot(Player player, RealTimeEngine presenter) : base (presenter)
           {
                HoastPlayer = player;
                Sprite = '\u2603';
                EOL = DateTime.MaxValue;
                StartAsync();
+               Hit += OnHit;
           }
 
           private async void StartAsync()
@@ -25,20 +26,21 @@ namespace Physics
 
                while (DateTime.UtcNow < EOL)
                {
-                    // when effectivnessModifyer reaches zero @ 100 hits, bot throws a snowball every 0.2 seconds
-                    int effectivnessModifyer = 1000 - 10 * HoastPlayer.OutgoingHits;
-                    if (effectivnessModifyer < 0)
-                         effectivnessModifyer = 0;
+                    // when agressionModifyer reaches zero @ 100 hits, bot throws a snowball every 0.2 seconds
+                    int agressionModifyer = 1000 - 10 * HoastPlayer.OutgoingHits;
+                    if (agressionModifyer < 0)
+                         agressionModifyer = 0;
 
-                    int awaitMs = 200 + _random.Next(2 * effectivnessModifyer); // 0.2 - 2 seconds
+                    int awaitMs = 200 + _random.Next(2 * agressionModifyer); // 0.2 - 2 seconds
                     await Task.Delay(awaitMs);
                     Vector lead = CalculateLead(this, HoastPlayer, SnowballSpeed);
                     ThrowSnowball(HoastPlayer.STPosition.Position + lead);
                     snowballThrowCount++;
+                    NotifyPropertyChanged(nameof(SpriteSize));
                     if (snowballThrowCount == nextChange)
                     {
                          ChangeTrajectory();
-                         nextChange = 3 + _random.Next(50 / (1 + effectivnessModifyer));
+                         nextChange = 3 + _random.Next(50 / (1 + agressionModifyer));
                          snowballThrowCount = 0;
                     }
                }
@@ -51,7 +53,7 @@ namespace Physics
                double tot = targetVector.Magnitude / interceptorSpeed;
                Vector lead = targetVelocity * tot;
                // also aim a bit down range from target
-               lead = lead - 0.2 * targetVector;
+               lead = lead - 0.1 * targetVector;
                return lead;
           }
 

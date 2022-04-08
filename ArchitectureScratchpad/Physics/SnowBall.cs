@@ -54,7 +54,7 @@ namespace Physics
                origin.Presenter.Add(new SnowBall(origin, stTarget));
           }
 
-          public override void CollideWith(IPhysicalObject collider)
+          public override void Interact(IPhysicalObject collider, DateTime now)
           {
                if (collider == this)
                     return;
@@ -63,8 +63,8 @@ namespace Physics
 
                if (collider.GetType() == typeof(SnowBall))
                {
-                    Presenter.Remove(this);
-                    Presenter.Remove(collider);
+                    collider.Dispose();
+                    Dispose();
                }
           }
      }

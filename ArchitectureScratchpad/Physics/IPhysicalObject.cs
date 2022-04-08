@@ -11,7 +11,7 @@ namespace Physics
           public object Sprite { get; set; }
           public DateTime EOL { get; set; }
           public IPhysicalObject Parent { get; set; }
-          public PresentationCollection Presenter {get; set;}
-          public void CollideWith(IPhysicalObject colider);
+          public RealTimeEngine Presenter {get; set;}
+          public void Interact(IPhysicalObject colider, DateTime now);
      }
 }
