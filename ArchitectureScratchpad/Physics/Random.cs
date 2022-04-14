@@ -11,7 +11,7 @@ namespace Physics
           { }
           public static Random Instance { get; } = new Random();
 
-          public double Randouble(double pmRange)
+          public double Double(double pmRange = 1)
           {
                return (-1 + 2 * NextDouble()) * pmRange;
           }

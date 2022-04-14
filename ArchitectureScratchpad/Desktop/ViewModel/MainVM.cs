@@ -1,4 +1,5 @@
 ﻿using Physics;
+using System;
 
 namespace Desktop
 {
@@ -9,6 +10,7 @@ namespace Desktop
           {
                UpdatePlayerTrajectoryCommand = new RelayCommand(UpdatePlayerTrajectory);
                ThrowSnowballCommand = new RelayCommand(ThrowSnowball, CanUpdateThrowsnowball);
+               // TODO populate player list externally in prep for server control
                Player = new Player(PhysicalObjects);
                SwatBot = new SwatBot(Player, PhysicalObjects);
           }
@@ -21,13 +23,13 @@ namespace Desktop
 
           private void UpdatePlayerTrajectory(object o)
           {
-               Player.UpdateTrajectory(o as Vector);
+               Player.MoveTo(o as Vector, DateTime.UtcNow);
           }
 
           public RelayCommand ThrowSnowballCommand;
           private void ThrowSnowball(object o)
           {
-               Player.ThrowSnowball(o as Vector);
+               Player.ThrowSnowball(o as Vector, DateTime.UtcNow);
           }
 
           private bool CanUpdateThrowsnowball(object o)

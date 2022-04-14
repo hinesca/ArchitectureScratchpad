@@ -4,23 +4,23 @@ using System.Linq;
 
 namespace Physics
 {
-     public class Trajectory
+     public class Trajectory : List<SpaceTimePos>
      {
-          public Trajectory(STPosition position)
+          public Trajectory(SpaceTimePos position)
           {
-               PathForward = new List<STPosition> { position };
+               Add(position);
                _previousPointOnPath = position;
                TrajectoryType = TrajectoryType.Grounded;
           }
 
-          public Trajectory(List<STPosition> path)
+          public Trajectory(List<SpaceTimePos> path)
           {
-               PathForward = path;
+               AddRange(path);
                _previousPointOnPath = path[0];
                TrajectoryType = TrajectoryType.Path;
           }
 
-          public Trajectory(Trajectory parent, STPosition parentOffset)
+          public Trajectory(Trajectory parent, SpaceTimePos parentOffset)
           {
                ParentTrajectory = parent;
                ParentOffset = parentOffset;
@@ -28,131 +28,105 @@ namespace Physics
           }
 
           public TrajectoryType TrajectoryType { get; set; }
-          public List<STPosition> PathForward { get; set; }
 
-          private STPosition _pathEndPoint;
-          public STPosition PathEndPoint
+
+          private SpaceTimePos _nextPointOnPath;
+          public SpaceTimePos NextPointOnPath(DateTime now)
           {
-               get
+               if (_nextPointOnPath == null || _nextPointOnPath.T < now)
                {
-                    DateTime now = DateTime.UtcNow;
-                    if (_pathEndPoint == null || _pathEndPoint.Time > now)
-                         _pathEndPoint = NextPointOnPath;
-
-                    return _pathEndPoint;
-               }
-          }
-
-          private STPosition _nextPointOnPath;
-          public STPosition NextPointOnPath
-          {
-               get
-               {
-                    DateTime now = DateTime.UtcNow;
-                    if (_nextPointOnPath == null || _nextPointOnPath.Time < now)
+                    // get the first point in the future
+                    _nextPointOnPath = this.FirstOrDefault(p => p.T > now);
+                    if (_nextPointOnPath == null) // generate new position in the arbitrary future
                     {
-                         // get the first point in the future
-                         _nextPointOnPath = PathForward.FirstOrDefault(p => p.Time > now);
-                         if (_nextPointOnPath == null) // generate new position in future
-                         {
-                              _nextPointOnPath
-                                   = new STPosition(PathEndPoint.Position, DateTime.MaxValue);
-                              PathForward.Add(_nextPointOnPath);
-                         }
+                         _nextPointOnPath
+                              = new SpaceTimePos(this.Last().S, DateTime.MaxValue);
+                         Add(_nextPointOnPath);
                     }
-                    return _nextPointOnPath;
                }
+               return _nextPointOnPath;
           }
 
-          private STPosition _previousPointOnPath;
-          public STPosition PreviousPointOnPath
+          private SpaceTimePos _previousPointOnPath;
+          public SpaceTimePos PreviousPointOnPath
           {
                get
                {
                     DateTime now = DateTime.UtcNow;
-                    STPosition[] path = PathForward.ToArray();
-                    
-                    for (int i = 0; i < path.Length; i++)
+                    if (_previousPointOnPath == null || _previousPointOnPath.T > now)
                     {
-                         if (path[i].Time < now)
+                         // get the last point in the past
+                         _previousPointOnPath = this.LastOrDefault(p => p.T > now);
+                         if (_previousPointOnPath == null) // generate new position now
                          {
-                              _previousPointOnPath = path[i];
-                              PathForward.Remove(_previousPointOnPath);
+                              _previousPointOnPath = new SpaceTimePos(this.First().S, now);
+                              Add(_previousPointOnPath);
                          }
-                         else return _previousPointOnPath;
                     }
                     return _previousPointOnPath;
                }
           }
 
-          /// <summary>
-          /// This velocity is calculated as the average velocity between the next and previous positions.
-          /// </summary>
-          public Vector Velocity
-          {
-               get
-               {
-                    // TODO: Review
-                    DateTime now = DateTime.UtcNow;
-
-                    if (now > PathEndPoint.Time)
-                         return new Vector(); // Zero vector
-
-                    STPosition next = NextPointOnPath;
-                    STPosition previous = PreviousPointOnPath;
-                    TimeSpan interval = next.Time - previous.Time;
-                    if (interval.TotalSeconds > 0)
-                         return (next.Position - previous.Position) * (1 / interval.TotalSeconds);
-                    else return new Vector(); // Zero vector
-               }
-          }
-
           public Trajectory ParentTrajectory { get; set; }
-          public STPosition ParentOffset { get; set; }
+          public SpaceTimePos ParentOffset { get; set; }
 
-          public STPosition GetPosition()
+          public SpaceTimePos GetPosition(DateTime now)
           {
-               return GetPosition(this);
+               return GetPosition(this, now);
           }
 
-          public static STPosition GetPosition(Trajectory trajectory)
+          public static SpaceTimePos GetPosition(Trajectory trajectory, DateTime now)
           {
                switch (trajectory.TrajectoryType)
                {
-                    case TrajectoryType.Grounded:
-                         return new STPosition(trajectory.PathForward[0]);
+                    //case TrajectoryType.Grounded:
+                    //     return new STPosition(trajectory[0].S, now);
                     case TrajectoryType.Path:
-                         return GetPositionOnPath(trajectory);
-                    case TrajectoryType.Offset:
-                         return GetOffsetPosition(trajectory);
-                    case TrajectoryType.Orbit:
-                         return GetOrbitalPosition(trajectory);
+                         return GetPositionOnPath(trajectory, now);
+                    //case TrajectoryType.Offset:
+                    //     return GetOffsetPosition(trajectory, now);
+                    //case TrajectoryType.Orbit:
+                    //     return GetOrbitalPosition(trajectory, now);
                     default:
                          return null;
                }
           }
 
-          private static STPosition GetPositionOnPath(Trajectory trajectory)
+          private static SpaceTimePos GetPositionOnPath(Trajectory trajectory, DateTime now)
           {
-               DateTime now = DateTime.UtcNow;
+               if (now > trajectory.Last().T)
+                    return new SpaceTimePos(trajectory.Last().S, now);
 
-               if (now > trajectory.PathEndPoint.Time)
-                    return new STPosition(trajectory.PathEndPoint.Position, now);
-
-               TimeSpan interval = now - trajectory.PreviousPointOnPath.Time;
-               Vector velocity = trajectory.Velocity;
-               double speed = velocity.Magnitude; // TODO incorporate into uncertainty or remove
-               return new STPosition(trajectory.PreviousPointOnPath.Position + velocity * interval.TotalSeconds, now);
+               TimeSpan interval = now - trajectory.PreviousPointOnPath.T;
+               Vector velocity = GetVelocity(trajectory, now);
+               return new SpaceTimePos(trajectory.PreviousPointOnPath.S + velocity * interval.TotalSeconds, now);
           }
 
-          private static STPosition GetOffsetPosition(Trajectory trajectory)
+          private static SpaceTimePos GetOffsetPosition(Trajectory trajectory, DateTime now)
           {
                throw new NotImplementedException();
           }
 
-          private static STPosition GetOrbitalPosition(Trajectory trajectory)
+          private static SpaceTimePos GetOrbitalPosition(Trajectory trajectory, DateTime now)
           {
                throw new NotImplementedException();
+          }
+
+          public Vector GetVelocity(DateTime now)
+          {
+               return GetVelocity(this, now);
+          }
+          public static Vector GetVelocity(Trajectory trajectory, DateTime now)
+          {
+               if (now > trajectory.Last().T)
+                    return new Vector(); // Zero vector
+
+               SpaceTimePos next = trajectory.NextPointOnPath(now);
+               SpaceTimePos previous = trajectory.PreviousPointOnPath;
+               TimeSpan interval = next.T - previous.T;
+               if (interval.TotalSeconds > 0)
+                    return (next.S - previous.S) * (1 / interval.TotalSeconds);
+               else return new Vector(); // Zero vector
           }
      }
 

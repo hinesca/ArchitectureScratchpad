@@ -39,7 +39,10 @@ namespace Physics
           // TODO check the math below, finish implementation
           public Vector Unit()
           {
-               return this * (1 / Magnitude);
+               double mag = Magnitude;
+               if (mag < 1e-100) // avoid divide by zero
+                    return new Vector(); // zero vector
+               return this * (1 / mag);
           }
 
           public double Magnitude
@@ -74,7 +77,6 @@ namespace Physics
           {
                throw new NotImplementedException("Cross product not implemented");
           }
-
 
           public override string ToString() => $"({X}, {Y}, {Z})";
 

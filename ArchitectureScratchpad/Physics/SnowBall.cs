@@ -5,20 +5,21 @@ namespace Physics
 {
      public class SnowBall : PhysicalObjectBase
      {
-          public SnowBall(IPhysicalObject origin, List<STPosition> path) : base(origin.Presenter)
+          public SnowBall(IPhysicalObject origin, List<SpaceTimePos> path) : base(origin.RTEngine)
           {
                Origin = origin;
                Trajectory = new Trajectory(path);
-               EOL = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+               EOL = DateTime.UtcNow + TimeSpan.FromSeconds(2);
                Sprite = 'o';
           }
 
-          public SnowBall(IPhysicalObject origin, STPosition target) : base(origin.Presenter)
+          public SnowBall(IPhysicalObject origin, SpaceTimePos target) : base(origin.RTEngine)
           {
+               DateTime now = DateTime.UtcNow;
                Origin = origin;
-               List<STPosition> path = new List<STPosition> { origin.STPosition, target };
+               List<SpaceTimePos> path = new List<SpaceTimePos> { origin.Trajectory.GetPosition(now), target };
                Trajectory = new Trajectory(path);
-               EOL = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+               EOL = now + TimeSpan.FromSeconds(2);
                Sprite = 'o';
           }
 
@@ -32,26 +33,6 @@ namespace Physics
                {
                     return UncertaintyS + 10;
                }
-          }
-
-          /// <summary>
-          /// TODO needs to change. Part of a lazy implementation.
-          /// </summary>
-          /// <param name="origin"></param>
-          /// <param name="target"></param>
-          /// <param name="speed"></param>
-          /// <returns></returns>
-          public static void ThrowSnowball(IPhysicalObject origin, Vector target, double speed, double errorMils = 0.1)
-          {
-               //Vector pos = origin.STPosition.Position;
-               double range = (target - origin.STPosition.Position).Magnitude;
-               Vector accuracyModifier
-                    = new Vector(_random.Randouble(1), _random.Randouble(1)).Unit() * errorMils * range;
-               target = target + accuracyModifier;
-               STPosition stTarget = new STPosition(target, DateTime.UtcNow.AddSeconds(range / speed));
-               // TODO figure out if we want to use this for more complex paths
-               //List<STPosition> path = new List<STPosition> { origin.STPosition, stTarget };
-               origin.Presenter.Add(new SnowBall(origin, stTarget));
           }
 
           public override void Interact(IPhysicalObject collider, DateTime now)

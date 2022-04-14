@@ -51,11 +51,11 @@ namespace Physics
                          continue;
                     }
 
-                    Vector poiPos = poi.STPosition.Position;
+                    Vector poiPos = poi.Trajectory.GetPosition(now).S;
                     for (int j = i + 1; j < collection.Length; j++)
                     {
                          IPhysicalObject poj = collection[j];
-                         Vector pojPos = poj.STPosition.Position;
+                         Vector pojPos = poj.Trajectory.GetPosition(now).S;
                          if ((pojPos - poiPos).Magnitude < poi.UncertaintyS + poj.UncertaintyS)
                          {
                               poi.Interact(poj, now);

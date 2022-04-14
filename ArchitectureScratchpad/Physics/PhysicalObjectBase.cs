@@ -8,23 +8,19 @@ namespace Physics
      {
           public PhysicalObjectBase(RealTimeEngine presenter)
           {
-               Presenter = presenter;
+               RTEngine = presenter;
           }
 
           public event EventHandler Hit;
 
-          STPosition _stPosition;
-          public STPosition STPosition
+          public SpaceTimePos GetPosition(DateTime now)
           {
-               get
-               {
-                    DateTime now = DateTime.UtcNow;
-                    if (_stPosition == null || _stPosition.Time < now + TimeSpan.FromMilliseconds(10))
-                         _stPosition = Trajectory.GetPosition();
-                    _stPosition.UncertaintyS = UncertaintyS;
-                    _stPosition.UncertaintyTms = UncertaintyTms;
-                    return _stPosition;
-               }
+               return Trajectory.GetPosition(now);
+          }
+
+          public Vector GetVelocity(DateTime now)
+          {
+               return Trajectory.GetVelocity(now);
           }
 
           public virtual void Interact(IPhysicalObject o, DateTime now)
@@ -42,28 +38,28 @@ namespace Physics
           {
                if (_disposed)
                     return;
-               Presenter.Remove(this);
+               RTEngine.Remove(this);
                EOL = DateTime.UtcNow;
                _disposed = true;
           }
 
           public double ViewportX
           {
-               get { return STPosition.Position.X; }
+               get { return GetPosition(DateTime.UtcNow).S.X; }
           }
 
           public double ViewportY
           {
-               get { return STPosition.Position.Y; }
+               get { return GetPosition(DateTime.UtcNow).S.Y; }
           }
 
           public Trajectory Trajectory { get; set; }
           public virtual double UncertaintyS { get; set; } = 1;
-          public double UncertaintyTms { get; set; } = 10;
+          public double UncertaintyT { get; set; } = 10;
           public DateTime EOL { get; set; }
           public object Sprite { get; set; }
           public IPhysicalObject Parent { get; set; }
-          public RealTimeEngine Presenter { get; set; }
+          public RealTimeEngine RTEngine { get; set; }
 
           public event PropertyChangedEventHandler PropertyChanged;
           /// <summary>

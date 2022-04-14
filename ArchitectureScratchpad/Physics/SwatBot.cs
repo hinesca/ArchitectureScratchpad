@@ -20,36 +20,44 @@ namespace Physics
 
           private async void StartAsync()
           {
+               DateTime now = DateTime.UtcNow;
+               long longNow = now.Ticks;
+               DateTime nowAgain = DateTime.FromBinary(longNow);
+               if (now == nowAgain)
+               {
+                    longNow++;
+               }
+               ChangeTrajectory(now);
                int snowballThrowCount = 0;
-               ChangeTrajectory();
                int nextChange = 2 + _random.Next(3); // 2 - 5 throws of the snowball
 
-               while (DateTime.UtcNow < EOL)
+               while (now < EOL)
                {
-                    // when agressionModifyer reaches zero @ 100 hits, bot throws a snowball every 0.2 seconds
-                    int agressionModifyer = 1000 - 10 * HoastPlayer.OutgoingHits;
-                    if (agressionModifyer < 0)
-                         agressionModifyer = 0;
+                    // when aggressionModifier reaches zero @ 100 hits, bot throws a snowball every 0.2 seconds
+                    int aggressionModifier = 1000 - 10 * HoastPlayer.OutgoingHits;
+                    if (aggressionModifier < 0)
+                         aggressionModifier = 0;
 
-                    int awaitMs = 200 + _random.Next(2 * agressionModifyer); // 0.2 - 2 seconds
+                    int awaitMs = 200 + _random.Next(2 * aggressionModifier); // 0.2 - 2 seconds
                     await Task.Delay(awaitMs);
-                    Vector lead = CalculateLead(this, HoastPlayer, SnowballSpeed);
-                    ThrowSnowball(HoastPlayer.STPosition.Position + lead);
+                    now = DateTime.UtcNow;
+                    Vector lead = CalculateLead(this, HoastPlayer, SnowballSpeed, now);
+                    ThrowSnowball(HoastPlayer.GetPosition(now).S + lead, now);
                     snowballThrowCount++;
-                    NotifyPropertyChanged(nameof(SpriteSize));
                     if (snowballThrowCount == nextChange)
                     {
-                         ChangeTrajectory();
-                         nextChange = 3 + _random.Next(50 / (1 + agressionModifyer));
+                         ChangeTrajectory(now);
+                         nextChange = 3 + _random.Next(50 / (1 + aggressionModifier));
                          snowballThrowCount = 0;
                     }
                }
           }
 
-          public static Vector CalculateLead(IPhysicalObject origin, IPhysicalObject target, double interceptorSpeed)
+          public static Vector CalculateLead(
+               IPhysicalObject origin, IPhysicalObject target, double interceptorSpeed, DateTime now)
           {
-               Vector targetVelocity = target.Trajectory.Velocity;
-               Vector targetVector = origin.STPosition.Position - target.STPosition.Position;
+               Vector targetVelocity = target.Trajectory.GetVelocity(now);
+               Vector targetVector = origin.Trajectory.GetPosition(now).S - target.Trajectory.GetPosition(now).S;
                double tot = targetVector.Magnitude / interceptorSpeed;
                Vector lead = targetVelocity * tot;
                // also aim a bit down range from target
@@ -57,11 +65,11 @@ namespace Physics
                return lead;
           }
 
-          private void ChangeTrajectory()
+          private void ChangeTrajectory(DateTime now)
           {
-               Vector p1 = HoastPlayer.STPosition.Position;
-               Vector target = new Vector(p1.X + _random.Randouble(300), p1.Y + _random.Randouble(300));
-               UpdateTrajectory(target);
+               Vector p1 = HoastPlayer.GetPosition(now).S;
+               Vector target = new Vector(p1.X + _random.Double(300), p1.Y + _random.Double(300));
+               MoveTo(target, now);
           }
 
           Player HoastPlayer { get; }
