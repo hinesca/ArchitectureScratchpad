@@ -5,17 +5,33 @@ using System.Threading.Tasks;
 
 namespace Physics
 {
-     public class RealTimeEngine : List<IPhysicalObject>, INotifyCollectionChanged, IDisposable// TODO, IPhysicalObject
+     public class RealTimeEngine : List<IPhysicalObject>, IPhysicalObject, INotifyCollectionChanged, IDisposable
      {
           public RealTimeEngine(int refreshIntervalMs = 10) : base()
           {
                RefreshIntervalMs = refreshIntervalMs;
+
+               // Each player will exist in one RTE
+               // and RTEs merge on interaction (overlapping uncertainty). TODO make configurable
+               // The primary purpose of uncertainty is to help mitigate latency issues.
+               UncertaintyS = 10000;
+               UncertaintyT = 1;
+               EOL = DateTime.MaxValue;
                Start();
           }
 
           private bool _disposed = false;
           public bool Running { get; set; }
           public int RefreshIntervalMs { get; set; }
+
+          // IPhysicalObject
+          public Trajectory Trajectory { get; set; }
+          public double UncertaintyS { get; set; }
+          public double UncertaintyT { get; set; }
+          public object Sprite { get; set; }
+          public DateTime EOL { get; set; }
+          public IPhysicalObject Parent { get; set; }
+          public RealTimeEngine RTEngine { get; set; }
 
           public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -31,20 +47,45 @@ namespace Physics
                while (Running)
                {
                     await Task.Delay(RefreshIntervalMs);
-                    // TODO Performance and deterministic enhancements by propagating now through static methods
+
+                    // now is set once and propagates through static methods
                     DateTime now = DateTime.UtcNow;
-                    Interact(ToArray(), now);
+                    Step();
                     OnCollectionChanged(
                          new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                }
-               // Dispose(); TODO maybe we want to freeze for serialization? idk, think about it.
           }
 
-          public static void Interact(IPhysicalObject[] collection, DateTime now)
+          public void Interact(IPhysicalObject po, DateTime now)
           {
-               for (int i = 0; i < collection.Length; i++)
+               if (po.GetType() == typeof(RealTimeEngine))
                {
-                    IPhysicalObject poi = collection[i];
+                    AddRange((RealTimeEngine)po);
+                    po.Dispose();
+               }
+               else
+               {
+                    Add(po);
+                    Interact(this, now);
+               }
+          }
+
+          private void Step()
+          {
+               DateTime now = DateTime.UtcNow;
+
+               for (int i = 0; i < Count; i++)
+               {
+                    IPhysicalObject poi = this[i];
+
+                    // The spacial uncertainty of a real time engine is the magnitude of the furthest point from the center of this RTE
+                    // or 10,000 units (pixels in the most simple context). TODO Make this 10,000 unit minimum uncertainty configurable.
+                    double posMag = poi.Trajectory.GetPosition(now).S.Magnitude;
+                    if (posMag > UncertaintyS)
+                    {
+                         UncertaintyS = posMag;
+                    }
+
                     if (now > poi.EOL)
                     {
                          poi.Dispose();
@@ -52,9 +93,9 @@ namespace Physics
                     }
 
                     Vector poiPos = poi.Trajectory.GetPosition(now).S;
-                    for (int j = i + 1; j < collection.Length; j++)
+                    for (int j = i + 1; j < Count; j++)
                     {
-                         IPhysicalObject poj = collection[j];
+                         IPhysicalObject poj = this[j];
                          Vector pojPos = poj.Trajectory.GetPosition(now).S;
                          if ((pojPos - poiPos).Magnitude < poi.UncertaintyS + poj.UncertaintyS)
                          {
@@ -77,6 +118,11 @@ namespace Physics
                }
                Clear(); // redundant if above is true
                _disposed = true;
+          }
+
+          public SpaceTimePos GetPosition(DateTime now)
+          {
+               throw new NotImplementedException();
           }
      }
 }

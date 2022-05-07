@@ -98,14 +98,14 @@ namespace Physics
                Trajectory = new Trajectory(path);
           }
 
-          public override void Interact(IPhysicalObject collider, DateTime now)
+          public override void Interact(IPhysicalObject po, DateTime now)
           {
-               if (collider == this)
+               if (po == this)
                     return;
 
-               if (collider.GetType() == typeof(SnowBall))
+               if (po.GetType() == typeof(SnowBall))
                {
-                    SnowBall snowBall = collider as SnowBall;
+                    SnowBall snowBall = po as SnowBall;
                     if (snowBall.Origin == this)
                          return;
 
@@ -115,7 +115,7 @@ namespace Physics
                     Vector bump = snowBall.GetVelocity(now).Unit() * 20;
 
                     MoveTo(GetPosition(now).S + bump, now, PlayerSpeed * 2);
-                    base.Interact(collider, now);
+                    base.Interact(po, now);
                     snowBall.Dispose();
                     OnHit(); // TODO smells?
                }
